@@ -7,6 +7,20 @@ from torch.utils.data import TensorDataset, Subset, ConcatDataset
 from torchvision.datasets import MNIST, ImageFolder
 from torchvision.transforms.functional import rotate
 
+import urllib
+import tarfile
+
+# download function
+def download_spawrious(data_dir, remove=True):
+    dst = os.path.join(data_dir, "spawrious.tar.gz")
+    urllib.request.urlretrieve('https://www.dropbox.com/s/wc9mwza5yk66i83/spawrious224.tar.gz?dl=1', dst)
+    tar = tarfile.open(dst, "r:gz")
+    tar.extractall(os.path.dirname(dst))
+    tar.close()
+    if remove:
+        os.remove(dst)
+
+
 
 def num_environments(dataset_name):
     return len(get_dataset_class(dataset_name).ENVIRONMENTS)
