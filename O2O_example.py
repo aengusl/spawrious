@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-from spawrious import Spawrious020_easy
+from spawrious import Spawrious020_easy, download_spawrious
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -20,6 +20,9 @@ print(device)
 path_to_dataset = ""
 
 batch_size = 64
+
+# downloads the dataset
+download_spawrious(path_to_dataset)
 
 datasets = Sparious020_easy(path_to_dataset)
 
