@@ -366,9 +366,9 @@ def load_spawrious_dataset(dataset_name: str, root_dir: str):
         "o2o_easy": "sc11.pth",
         "o2o_medium": "sc12.pth",
         "o2o_hard": "sc13.pth",
-        "m2m_hard": "sc21.pth",
         "m2m_easy": "sc22.pth",
         "m2m_medium": "sc23.pth",
+        "m2m_hard": "sc21.pth",
     }
     filename = filename_map.get(dataset_name.lower())
     if filename is None:
