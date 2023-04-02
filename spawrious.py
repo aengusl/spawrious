@@ -12,9 +12,9 @@ from config_spawrious import get_config
 
 
 def _extract_dataset_from_tar(
-    data_dir: str, remove_tar_after_extracting: bool = True
+    tar_file_name: str, data_dir: str, remove_tar_after_extracting: bool = True
 ) -> None:
-    tar_file_dst = os.path.join(data_dir, "spawrious.tar.gz")
+    tar_file_dst = os.path.join(data_dir, tar_file_name)
     print("Extracting dataset...")
     tar = tarfile.open(tar_file_dst, "r:gz")
     tar.extractall(os.path.dirname(tar_file_dst))
@@ -49,23 +49,34 @@ def _download_dataset_if_not_available(
     # Check if the tar file is already downloaded and present in the data_dir
     if os.path.exists(tar_file_dst):
         print("Dataset already downloaded.")
-        # Check if the dataset is already extracted by inspecting the datasets.txt file
-        assert os.path.exists(os.path.join(data_dir, "datasets.txt")); "datasets.txt file not found, and is essential for checking if the dataset is already extracted. A incompletely downloaded tar file may be present. Delete the file and try again."
-        with open(os.path.join(data_dir, 'datasets.txt'), 'r') as f:
-            lines = set(f.readlines())
-            if (dataset_name in lines) or ('entire_dataset' in lines):
-                print("... and extracted.")
-            else:
-                print("Dataset not extracted. Extracting...")
-                _extract_dataset_from_tar(data_dir, remove_tar_after_extracting)
-                # Write the dataset name to the datasets.txt file to mark extraction
-                with open(os.path.join(data_dir, 'datasets.txt'), 'a') as f:
-                    f.write(dataset_name)
+
+        # Check if the datasets.txt file is present, and if the dataset is already extracted
+        if os.path.exists(os.path.join(data_dir, "datasets.txt")):
+            with open(os.path.join(data_dir, 'datasets.txt'), 'r') as f:
+                lines = set(f.readlines())
+                if (dataset_name in lines) or ('entire_dataset' in lines):
+                    print("... and extracted.")
+                else:
+                    print("Dataset not extracted. Extracting...")
+                    _extract_dataset_from_tar(tar_file_name, data_dir, remove_tar_after_extracting)
+
+                    # Write the dataset name to the datasets.txt file to mark extraction
+                    with open(os.path.join(data_dir, 'datasets.txt'), 'a') as f:
+                        f.write('\n' + dataset_name)
+
+        # If the datasets.txt file is not present, then extract the dataset
+        else:
+            print("Dataset not extracted. Extracting...")
+            _extract_dataset_from_tar(tar_file_name, data_dir, remove_tar_after_extracting)
+
+            # Write the dataset name to the datasets.txt file to mark extraction
+            with open(os.path.join(data_dir, 'datasets.txt'), 'a') as f:
+                f.write('\n' + dataset_name)
 
     # Check if the dataset is already extracted by inspecting the datasets.txt file
-    # elif os.path.exists(os.path.join(data_dir, "spawrious224")):
     else:
         download = True
+
         # Check if the datasets.txt file is present, and if the dataset is already extracted
         if os.path.exists(os.path.join(data_dir, "datasets.txt")):
             with open(os.path.join(data_dir, 'datasets.txt'), 'r') as f:
@@ -73,6 +84,7 @@ def _download_dataset_if_not_available(
                 if (dataset_name in lines) or ('entire_dataset' in lines):
                     print("Dataset already downloaded and extracted.")
                     download = False
+
         # Download if the dataset is not already extracted
         if download:
             print("Dataset not found. Downloading...")
@@ -92,10 +104,11 @@ def _download_dataset_if_not_available(
             progress_bar.close()
             
             print("Dataset downloaded. Extracting...")
-            _extract_dataset_from_tar(data_dir, remove_tar_after_extracting)
+            _extract_dataset_from_tar(tar_file_name, data_dir, remove_tar_after_extracting)
+
             # Write the dataset name to the datasets.txt file to mark extraction
             with open(os.path.join(data_dir, 'datasets.txt'), 'a') as f:
-                f.write(dataset_name)
+                f.write('\n' + dataset_name)
 
 
 class MultipleDomainDataset:
