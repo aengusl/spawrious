@@ -2,18 +2,14 @@ import os
 import tarfile
 import urllib
 import urllib.request
+from typing import Any, Tuple
 
 import torch
-from torch.utils.data import ConcatDataset, Subset, TensorDataset, Dataset
-from torchvision import transforms
-from torchvision.datasets import MNIST, ImageFolder
-from tqdm import tqdm
-
 from PIL import Image
-
-from torch.utils.data import Dataset
-
-from typing import Any, Tuple
+from torch.utils.data import ConcatDataset, Dataset
+from torchvision import transforms
+from torchvision.datasets import ImageFolder
+from tqdm import tqdm
 
 
 def _extract_dataset_from_tar(
@@ -300,7 +296,7 @@ class SpawriousBenchmark(MultipleDomainDataset):
         return combinations
 
     # Buils combination dictionary for m2m datasets
-    def build_type2_combinations(self, group, test):
+    def build_type2_combination(self, group, test):
         total = 3168
         counts = [total, total]
         combinations = {}
@@ -352,22 +348,11 @@ class SpawriousBenchmark(MultipleDomainDataset):
             raise ValueError("Invalid benchmark type")
 
 
-def download_spawrious_dataset(dataset_name: str, root_dir: str):
+def _download_spawrious_dataset(dataset_name: str, root_dir: str):
     """
     Downloads the dataset if it is not already available.
     """
-    assert dataset_name.lower() in set(
-        [
-            "o2o_easy",
-            "o2o_medium",
-            "o2o_hard",
-            "m2m_easy",
-            "m2m_medium",
-            "m2m_hard",
-            "m2m",
-            "entire_dataset",
-        ]
-    )
+
     os.makedirs(root_dir, exist_ok=True)
     _download_dataset_if_not_available(dataset_name, root_dir)
 
@@ -377,20 +362,18 @@ def get_torch_dataset(dataset_name: str, root_dir: str):
     Returns the dataset as a torch dataset, and downloads it if it is not already available.
     """
 
-    if dataset_name.lower() not in [
+    assert dataset_name.lower() in {
         "o2o_easy",
         "o2o_medium",
         "o2o_hard",
         "m2m_easy",
         "m2m_medium",
         "m2m_hard",
-    ]:
-        import pdb
+        "m2m",
+        "entire_dataset",
+    }, f"Invalid dataset type: {dataset_name}"
 
-        pdb.set_trace()
-        raise ValueError(f"Invalid dataset type: {dataset_name}")
-
-    # download_spawrious_dataset(dataset_name, root_dir)
+    _download_spawrious_dataset(dataset_name, root_dir)
 
     dataset = SpawriousBenchmark(dataset_name, root_dir, augment=True)
     return dataset
