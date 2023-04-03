@@ -1,2 +1,5 @@
 data
 *pycache*
+.idea/
+.DS_Store
+
