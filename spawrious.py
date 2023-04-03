@@ -31,11 +31,10 @@ def _download_dataset_if_not_available(
     """
     datasets.txt file, which is present in the data_dir, is used to check if the dataset is already extracted. If the dataset is already extracted, then the tar file is not downloaded again.
     """
-
+    os.makedirs(data_dir, exist_ok=True)
     dataset_name = dataset_name.lower()
     if dataset_name.split("_")[0] == "m2m":
         dataset_name = "m2m"
-
     url_dict = {
         "entire_dataset": "https://www.dropbox.com/s/wc9mwza5yk66i83/spawrious224.tar.gz?dl=1",
         "o2o_easy": "https://www.dropbox.com/s/bonf1elisg2ohiq/spawrious__o2o_easy.tar.gz?dl=1",
@@ -46,11 +45,9 @@ def _download_dataset_if_not_available(
     tar_file_name = f"spawrious__{dataset_name}.tar.gz"
     tar_file_dst = os.path.join(data_dir, tar_file_name)
     url = url_dict[dataset_name]
-
     # Check if the tar file is already downloaded and present in the data_dir
     if os.path.exists(tar_file_dst):
         print("Dataset already downloaded.")
-
         # Check if the datasets.txt file is present, and if the dataset is already extracted
         if os.path.exists(os.path.join(data_dir, "datasets.txt")):
             with open(os.path.join(data_dir, "datasets.txt"), "r") as f:
@@ -67,22 +64,18 @@ def _download_dataset_if_not_available(
                     # Write the dataset name to the datasets.txt file to mark extraction
                     with open(os.path.join(data_dir, "datasets.txt"), "a") as f:
                         f.write("\n" + dataset_name)
-
         # If the datasets.txt file is not present, then extract the dataset
         else:
             print("Dataset not extracted. Extracting...")
             _extract_dataset_from_tar(
                 tar_file_name, data_dir, remove_tar_after_extracting
             )
-
             # Write the dataset name to the datasets.txt file to mark extraction
             with open(os.path.join(data_dir, "datasets.txt"), "a") as f:
                 f.write("\n" + dataset_name)
-
     # Check if the dataset is already extracted by inspecting the datasets.txt file
     else:
         download = True
-
         # Check if the datasets.txt file is present, and if the dataset is already extracted
         if os.path.exists(os.path.join(data_dir, "datasets.txt")):
             with open(os.path.join(data_dir, "datasets.txt"), "r") as f:
@@ -91,14 +84,12 @@ def _download_dataset_if_not_available(
                 if (dataset_name in lines) or ("entire_dataset" in lines):
                     print("Dataset already downloaded and extracted.")
                     download = False
-
         # Download if the dataset is not already extracted
         if download:
             print("Dataset not found. Downloading...")
             response = urllib.request.urlopen(url)
             total_size = int(response.headers.get("Content-Length", 0))
             block_size = 1024
-
             # Track progress of download
             progress_bar = tqdm(total=total_size, unit="iB", unit_scale=True)
             with open(tar_file_dst, "wb") as f:
@@ -109,12 +100,10 @@ def _download_dataset_if_not_available(
                     f.write(buffer)
                     progress_bar.update(len(buffer))
             progress_bar.close()
-
             print("Dataset downloaded. Extracting...")
             _extract_dataset_from_tar(
                 tar_file_name, data_dir, remove_tar_after_extracting
             )
-
             # Write the dataset name to the datasets.txt file to mark extraction
             with open(os.path.join(data_dir, "datasets.txt"), "a") as f:
                 f.write("\n" + dataset_name)
@@ -348,20 +337,10 @@ class SpawriousBenchmark(MultipleDomainDataset):
             raise ValueError("Invalid benchmark type")
 
 
-def _download_spawrious_dataset(dataset_name: str, root_dir: str):
-    """
-    Downloads the dataset if it is not already available.
-    """
-
-    os.makedirs(root_dir, exist_ok=True)
-    _download_dataset_if_not_available(dataset_name, root_dir)
-
-
 def get_torch_dataset(dataset_name: str, root_dir: str):
     """
     Returns the dataset as a torch dataset, and downloads it if it is not already available.
     """
-
     assert dataset_name.lower() in {
         "o2o_easy",
         "o2o_medium",
@@ -372,8 +351,5 @@ def get_torch_dataset(dataset_name: str, root_dir: str):
         "m2m",
         "entire_dataset",
     }, f"Invalid dataset type: {dataset_name}"
-
-    _download_spawrious_dataset(dataset_name, root_dir)
-
-    dataset = SpawriousBenchmark(dataset_name, root_dir, augment=True)
-    return dataset
+    _download_dataset_if_not_available(dataset_name, root_dir)
+    return SpawriousBenchmark(dataset_name, root_dir, augment=True)
