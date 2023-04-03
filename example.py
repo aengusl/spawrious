@@ -5,7 +5,7 @@ import torch.optim as optim
 from torch import nn
 from torchvision import models
 
-from spawrious import load_spawrious_dataset
+from spawrious import get_torch_dataset
 
 
 def parse_args():
@@ -39,22 +39,22 @@ def parse_args():
     return parser.parse_args()
 
 
-def train(model, train_loader, optimizer, criterion, num_epochs):
+def train(model, train_loader, optimizer, criterion, num_epochs, device):
     for epoch in range(num_epochs):  # loop over the dataset multiple times
         running_loss = 0.0
-        for i, batches in enumerate(train_loader, 0):
-            for data in batches:
-                # get the inputs; data is a list of [inputs, labels]
-                inputs, labels = data
-                # zero the parameter gradients
-                optimizer.zero_grad()
-                # forward + backward + optimize
-                outputs = model(inputs)
-                loss = criterion(outputs, labels)
-                loss.backward()
-                optimizer.step()
-                # print statistics
-                running_loss += loss.item()
+        for i, data in enumerate(train_loader, 0):
+            # get the inputs; data is a list of [inputs, labels]
+            inputs, labels = data
+            inputs, labels = inputs.to(device), labels.to(device)
+            # zero the parameter gradients
+            optimizer.zero_grad()
+            # forward + backward + optimize
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+            # print statistics
+            running_loss += loss.item()
         print(f"[{epoch + 1}] loss: {running_loss / len(train_loader):.3f}")
     print("Finished Training")
 
@@ -78,7 +78,7 @@ def evaluate(model, test_loader):
 def main():
     args = parse_args()
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    datasets = load_spawrious_dataset(dataset_name=args.dataset, root_dir=args.data_dir)
+    datasets = get_torch_dataset(dataset_name=args.dataset, root_dir=args.data_dir)
     train_sets = datasets.datasets[1:]
     trainset = torch.utils.data.ConcatDataset(train_sets)
     train_loader = torch.utils.data.DataLoader(
@@ -98,7 +98,7 @@ def main():
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
-    train(model, train_loader, optimizer, criterion, args.num_epochs)
+    train(model, train_loader, optimizer, criterion, args.num_epochs, device)
     evaluate(model, test_loader)
 
 
