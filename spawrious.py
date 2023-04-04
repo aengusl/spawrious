@@ -154,7 +154,6 @@ class MultipleDomainDataset:
         return len(self.datasets)
 
 
-# Buils combination dictionary for m2m datasets
 def build_combination(benchmark_type, group, test, filler=None):
     total = 3168
     combinations = {}
@@ -193,7 +192,6 @@ def build_combination(benchmark_type, group, test, filler=None):
     return combinations
 
 
-# Builds the combinations for the type of benchmark.
 def get_combinations(benchmark_type: str) -> Tuple[dict, dict]:
     combinations = {
         "o2o_easy": (
