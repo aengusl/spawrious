@@ -41,11 +41,11 @@ def _download_dataset_if_not_available(
         dataset_name = "m2m"
 
     url_dict = {
-        "entire_dataset": "https://www.dropbox.com/s/wc9mwza5yk66i83/spawrious224.tar.gz?dl=1",
-        "o2o_easy": "https://www.dropbox.com/s/bonf1elisg2ohiq/spawrious__o2o_easy.tar.gz?dl=1",
-        "o2o_medium": "https://www.dropbox.com/s/xfea065mhh70me1/spawrious__o2o_medium.tar.gz?dl=1",
-        "o2o_hard": "https://www.dropbox.com/s/m5eeqp0nsc31nyt/spawrious__o2o_hard.tar.gz?dl=1",
-        "m2m": "https://www.dropbox.com/s/spwszi0rxbf53f8/spawrious__m2m.tar.gz?dl=1",
+        "entire_dataset": "https://www.dropbox.com/s/e40j553480h3f3s/spawrious224.tar.gz?dl=1",
+        "o2o_easy": "https://www.dropbox.com/s/kwhiv60ihxe3owy/spawrious__o2o_easy.tar.gz?dl=1",
+        "o2o_medium": "https://www.dropbox.com/s/x03gkhdwar5kht4/spawrious224__o2o_medium.tar.gz?dl=1",
+        "o2o_hard": "https://www.dropbox.com/s/p1ry121m2gjj158/spawrious__o2o_hard.tar.gz?dl=1",
+        "m2m": "https://www.dropbox.com/s/5usem63nfub266y/spawrious__m2m.tar.gz?dl=1",
     }
     tar_file_name = f"spawrious__{dataset_name}.tar.gz"
     tar_file_dst = os.path.join(data_dir, tar_file_name)
