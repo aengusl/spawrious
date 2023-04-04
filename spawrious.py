@@ -154,6 +154,85 @@ class MultipleDomainDataset:
         return len(self.datasets)
 
 
+# Buils combination dictionary for m2m datasets
+def build_combination(benchmark_type, group, test, filler=None):
+    total = 3168
+    combinations = {}
+    if "m2m" in benchmark_type:
+        counts = [total, total]
+        combinations["train_combinations"] = {
+            ("bulldog",): [(group[0], counts[0]), (group[1], counts[1])],
+            ("dachshund",): [(group[1], counts[0]), (group[0], counts[1])],
+            ("labrador",): [(group[2], counts[0]), (group[3], counts[1])],
+            ("corgi",): [(group[3], counts[0]), (group[2], counts[1])],
+        }
+        combinations["test_combinations"] = {
+            ("bulldog",): [test[0], test[1]],
+            ("dachshund",): [test[1], test[0]],
+            ("labrador",): [test[2], test[3]],
+            ("corgi",): [test[3], test[2]],
+        }
+    else:
+        counts = [int(0.97 * total), int(0.87 * total)]
+        combinations["train_combinations"] = {
+            ("bulldog",): [(group[0], counts[0]), (group[0], counts[1])],
+            ("dachshund",): [(group[1], counts[0]), (group[1], counts[1])],
+            ("labrador",): [(group[2], counts[0]), (group[2], counts[1])],
+            ("corgi",): [(group[3], counts[0]), (group[3], counts[1])],
+            ("bulldog", "dachshund", "labrador", "corgi"): [
+                (filler, total - counts[0]),
+                (filler, total - counts[1]),
+            ],
+        }
+        combinations["test_combinations"] = {
+            ("bulldog",): [test[0], test[0]],
+            ("dachshund",): [test[1], test[1]],
+            ("labrador",): [test[2], test[2]],
+            ("corgi",): [test[3], test[3]],
+        }
+    return combinations
+
+
+# Builds the combinations for the type of benchmark.
+def get_combinations(benchmark_type: str) -> Tuple[dict, dict]:
+    combinations = {
+        "o2o_easy": (
+            ["desert", "jungle", "dirt", "snow"],
+            ["dirt", "snow", "desert", "jungle"],
+            "beach",
+        ),
+        "o2o_medium": (
+            ["mountain", "beach", "dirt", "jungle"],
+            ["jungle", "dirt", "beach", "snow"],
+            "desert",
+        ),
+        "o2o_hard": (
+            ["jungle", "mountain", "snow", "desert"],
+            ["mountain", "snow", "desert", "jungle"],
+            "beach",
+        ),
+        "m2m_hard": (
+            ["dirt", "jungle", "snow", "beach"],
+            ["snow", "beach", "dirt", "jungle"],
+            None,
+        ),
+        "m2m_easy": (
+            ["desert", "mountain", "dirt", "jungle"],
+            ["dirt", "jungle", "mountain", "desert"],
+            None,
+        ),
+        "m2m_medium": (
+            ["beach", "snow", "mountain", "desert"],
+            ["desert", "mountain", "beach", "snow"],
+            None,
+        ),
+    }
+    if benchmark_type not in combinations:
+        raise ValueError("Invalid benchmark type")
+    group, test, filler = combinations[benchmark_type]
+    return build_combination(benchmark_type, group, test, filler)
+
+
 class SpawriousBenchmark(MultipleDomainDataset):
     ENVIRONMENTS = ["Test", "SC_group_1", "SC_group_2"]
     input_shape = (3, 224, 224)
@@ -161,7 +240,7 @@ class SpawriousBenchmark(MultipleDomainDataset):
     class_list = ["bulldog", "corgi", "dachshund", "labrador"]
 
     def __init__(self, benchmark, root_dir, augment=True):
-        combinations = self.get_combinations(benchmark.lower())
+        combinations = get_combinations(benchmark.lower())
         self.type1 = benchmark.lower().startswith("o2o")
         train_datasets, test_datasets = self._prepare_data_lists(
             combinations["train_combinations"],
@@ -257,91 +336,6 @@ class SpawriousBenchmark(MultipleDomainDataset):
                 data_list.append(data)
 
         return data_list
-
-    # Buils combination dictionary for o2o datasets
-    def build_type1_combination(self, group, test, filler):
-        total = 3168
-        counts = [int(0.97 * total), int(0.87 * total)]
-        combinations = {}
-        combinations["train_combinations"] = {
-            ## correlated class
-            ("bulldog",): [(group[0], counts[0]), (group[0], counts[1])],
-            ("dachshund",): [(group[1], counts[0]), (group[1], counts[1])],
-            ("labrador",): [(group[2], counts[0]), (group[2], counts[1])],
-            ("corgi",): [(group[3], counts[0]), (group[3], counts[1])],
-            ## filler
-            ("bulldog", "dachshund", "labrador", "corgi"): [
-                (filler, total - counts[0]),
-                (filler, total - counts[1]),
-            ],
-        }
-        ## TEST
-        combinations["test_combinations"] = {
-            ("bulldog",): [test[0], test[0]],
-            ("dachshund",): [test[1], test[1]],
-            ("labrador",): [test[2], test[2]],
-            ("corgi",): [test[3], test[3]],
-        }
-        return combinations
-
-    # Buils combination dictionary for m2m datasets
-    def build_type2_combination(self, group, test):
-        total = 3168
-        counts = [total, total]
-        combinations = {}
-        combinations["train_combinations"] = {
-            ## correlated class
-            ("bulldog",): [(group[0], counts[0]), (group[1], counts[1])],
-            ("dachshund",): [(group[1], counts[0]), (group[0], counts[1])],
-            ("labrador",): [(group[2], counts[0]), (group[3], counts[1])],
-            ("corgi",): [(group[3], counts[0]), (group[2], counts[1])],
-        }
-        combinations["test_combinations"] = {
-            ("bulldog",): [test[0], test[1]],
-            ("dachshund",): [test[1], test[0]],
-            ("labrador",): [test[2], test[3]],
-            ("corgi",): [test[3], test[2]],
-        }
-        return combinations
-
-    # Builds the combinations for the first type of benchmark.
-    def get_combinations(self, benchmark_type):
-        combinations = {
-            "o2o_easy": (
-                ["desert", "jungle", "dirt", "snow"],
-                ["dirt", "snow", "desert", "jungle"],
-                "beach",
-            ),
-            "o2o_medium": (
-                ["mountain", "beach", "dirt", "jungle"],
-                ["jungle", "dirt", "beach", "snow"],
-                "desert",
-            ),
-            "o2o_hard": (
-                ["jungle", "mountain", "snow", "desert"],
-                ["mountain", "snow", "desert", "jungle"],
-                "beach",
-            ),
-            "m2m_hard": (
-                ["dirt", "jungle", "snow", "beach"],
-                ["snow", "beach", "dirt", "jungle"],
-            ),
-            "m2m_easy": (
-                ["desert", "mountain", "dirt", "jungle"],
-                ["dirt", "jungle", "mountain", "desert"],
-            ),
-            "m2m_medium": (
-                ["beach", "snow", "mountain", "desert"],
-                ["desert", "mountain", "beach", "snow"],
-            ),
-        }
-        if benchmark_type not in combinations:
-            raise ValueError("Invalid benchmark type")
-        group, test, filler = combinations[benchmark_type]
-        if "m2m" in benchmark_type:
-            return self.build_type2_combination(group, test)
-        else:
-            return self.build_type1_combination(group, test, filler)
 
 
 def get_torch_dataset(dataset_name: str, root_dir: str):
