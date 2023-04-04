@@ -306,35 +306,42 @@ class SpawriousBenchmark(MultipleDomainDataset):
 
     # Builds the combinations for the first type of benchmark.
     def get_combinations(self, benchmark_type):
-        if benchmark_type == "o2o_easy":
-            group = ["desert", "jungle", "dirt", "snow"]
-            test = ["dirt", "snow", "desert", "jungle"]
-            filler = "beach"
-            return self.build_type1_combination(group, test, filler)
-        elif benchmark_type == "o2o_medium":
-            group = ["mountain", "beach", "dirt", "jungle"]
-            test = ["jungle", "dirt", "beach", "snow"]
-            filler = "desert"
-            return self.build_type1_combination(group, test, filler)
-        elif benchmark_type == "o2o_hard":
-            group = ["jungle", "mountain", "snow", "desert"]
-            test = ["mountain", "snow", "desert", "jungle"]
-            filler = "beach"
-            return self.build_type1_combination(group, test, filler)
-        elif benchmark_type == "m2m_hard":
-            group = ["dirt", "jungle", "snow", "beach"]
-            test = ["snow", "beach", "dirt", "jungle"]
-            return self.build_type2_combination(group, test)
-        elif benchmark_type == "m2m_easy":
-            group = ["desert", "mountain", "dirt", "jungle"]
-            test = ["dirt", "jungle", "mountain", "desert"]
-            return self.build_type2_combination(group, test)
-        elif benchmark_type == "m2m_medium":
-            group = ["beach", "snow", "mountain", "desert"]
-            test = ["desert", "mountain", "beach", "snow"]
+        combinations = {
+            "o2o_easy": (
+                ["desert", "jungle", "dirt", "snow"],
+                ["dirt", "snow", "desert", "jungle"],
+                "beach",
+            ),
+            "o2o_medium": (
+                ["mountain", "beach", "dirt", "jungle"],
+                ["jungle", "dirt", "beach", "snow"],
+                "desert",
+            ),
+            "o2o_hard": (
+                ["jungle", "mountain", "snow", "desert"],
+                ["mountain", "snow", "desert", "jungle"],
+                "beach",
+            ),
+            "m2m_hard": (
+                ["dirt", "jungle", "snow", "beach"],
+                ["snow", "beach", "dirt", "jungle"],
+            ),
+            "m2m_easy": (
+                ["desert", "mountain", "dirt", "jungle"],
+                ["dirt", "jungle", "mountain", "desert"],
+            ),
+            "m2m_medium": (
+                ["beach", "snow", "mountain", "desert"],
+                ["desert", "mountain", "beach", "snow"],
+            ),
+        }
+        if benchmark_type not in combinations:
+            raise ValueError("Invalid benchmark type")
+        group, test, filler = combinations[benchmark_type]
+        if "m2m" in benchmark_type:
             return self.build_type2_combination(group, test)
         else:
-            raise ValueError("Invalid benchmark type")
+            return self.build_type1_combination(group, test, filler)
 
 
 def get_torch_dataset(dataset_name: str, root_dir: str):
