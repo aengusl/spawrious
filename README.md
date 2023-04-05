@@ -1,3 +1,3 @@
 # spawrious
 
-to be continued...
+This project is licensed under the terms of the MIT license.
