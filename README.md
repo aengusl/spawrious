@@ -31,6 +31,12 @@ data
 | spawrious224/
 ```
 
+project
+│   README.md
+│   file001.txt
+│
+└───folder1
+
 ### Click to download the datasets:
 - [entire_dataset](https://www.dropbox.com/s/e40j553480h3f3s/spawrious224.tar.gz?dl=1)
 - [one-to-one easy](https://www.dropbox.com/s/kwhiv60ihxe3owy/spawrious__o2o_easy.tar.gz?dl=1)
