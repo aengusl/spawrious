@@ -13,7 +13,7 @@ Datasets take the following names:
 - `o2o_hard`
 - `m2m` 
  
-Running the command below retrives the appropriate dataset at a user specified user directory (and downloads the dataset if not available), trains a [resnet18](https://pytorch.org/hub/pytorch_vision_resnet/), and evaluates the results on the OOD test set.
+Running the command below retrieves the appropriate dataset at a user specified user directory (and downloads the dataset if not available), trains a [resnet18](https://pytorch.org/hub/pytorch_vision_resnet/), and evaluates the results on the OOD test set.
 
 ```
 python example.py --root_dir <path to data dir> --dataset_name <one of the list above>
@@ -23,19 +23,19 @@ python example.py --root_dir <path to data dir> --dataset_name <one of the list 
 
 ### Formatting
 
-The datasets overlap in images, but are offered separately anyway. In order to avoid image duplicates, create a text file `datasets.txt` in the data directory (`path to data dir`), with the name of the dataset that has been downloaded. For example, if one-to-one easy has been downloaded, the data d directory will look like
+The datasets overlap in images, but are offered separately anyway. In order to avoid image duplicates, create a text file `datasets.txt` in the data directory (`path to data dir`), with the name of the dataset that has been downloaded. For example, if both one-to-one easy and one-to-one hard have been downloaded, the data directory will look like
 
 ```
 data
-| datasets.txt
-| spawrious224/
+│   datasets.txt
+└───spawrious224
 ```
+where the `datasets.txt` file looks like
 
-project
-│   README.md
-│   file001.txt
-│
-└───folder1
+```
+o2o_easy
+o2o_hard
+```
 
 ### Click to download the datasets:
 - [entire_dataset](https://www.dropbox.com/s/e40j553480h3f3s/spawrious224.tar.gz?dl=1)
