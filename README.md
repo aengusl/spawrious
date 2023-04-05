@@ -23,6 +23,12 @@ python example.py --root_dir <path to data dir> --dataset_name <one of the list 
 
 ### Formatting
 
+The datasets overlap in images, but are offered separately anyway. In order to avoid image duplicates, create a text file `datasets.txt` in the data directory (`path to data dir`), with the name of the dataset that has been downloaded. For example, if one-to-one easy has been downloaded, the data d directory will look like
+
+data
+| datasets.txt
+| spawrious224/
+
 ### Click to download the datasets:
 - [entire_dataset](https://www.dropbox.com/s/e40j553480h3f3s/spawrious224.tar.gz?dl=1)
 - [one-to-one easy](https://www.dropbox.com/s/kwhiv60ihxe3owy/spawrious__o2o_easy.tar.gz?dl=1)
