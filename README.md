@@ -18,7 +18,7 @@ Datasets take the following names:
 Running the command below retrieves the appropriate dataset at a user specified user directory (and downloads the dataset if not available), trains a [resnet18](https://pytorch.org/hub/pytorch_vision_resnet/), and evaluates the results on the OOD test set.
 
 ```
-python example.py --root_dir <path to data dir> --dataset_name <one of the list above>
+python example.py --data_dir <path to data dir> --dataset <one of the list above>
 ```
 
 ## Downloading the datasets
