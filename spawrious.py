@@ -305,7 +305,9 @@ class SpawriousBenchmark(MultipleDomainDataset):
                     cg_data_list = []
                     for cls in classes:
                         path = os.path.join(
-                            root_dir, f"{0 if not self.type1 else ind}/{location}/{cls}"
+                            root_dir,
+                            "spawrious224",
+                            f"{0 if not self.type1 else ind}/{location}/{cls}",
                         )
                         data = CustomImageFolder(
                             folder_path=path,
