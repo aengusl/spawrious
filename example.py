@@ -4,6 +4,7 @@ import torch
 import torch.optim as optim
 from torch import nn
 from torchvision import models
+from tqdm import tqdm
 
 from spawrious import get_torch_dataset
 
@@ -41,7 +42,9 @@ def parse_args():
 
 
 def train(model, train_loader, optimizer, criterion, num_epochs, device):
-    for epoch in range(num_epochs):  # loop over the dataset multiple times
+    for epoch in tqdm(
+        range(num_epochs), desc="Epochs"
+    ):  # loop over the dataset multiple times
         running_loss = 0.0
         for i, data in enumerate(train_loader, 0):
             # get the inputs; data is a list of [inputs, labels]
@@ -56,8 +59,7 @@ def train(model, train_loader, optimizer, criterion, num_epochs, device):
             optimizer.step()
             # print statistics
             running_loss += loss.item()
-        print(f"[{epoch + 1}] loss: {running_loss / len(train_loader):.3f}")
-    print("Finished Training")
+        print(f"Epoch [{epoch + 1}]: Loss: {running_loss / len(train_loader):.3f}")
 
 
 def evaluate(model, test_loader):
