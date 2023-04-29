@@ -248,6 +248,12 @@ class SpawriousBenchmark(MultipleDomainDataset):
         )
         self.datasets = [ConcatDataset(test_datasets)] + train_datasets
 
+    def get_train_dataset(self):
+        return torch.utils.data.ConcatDataset(self.datasets[1:])
+
+    def get_test_dataset(self):
+        return self.datasets[0]
+
     # Prepares the train and test data lists by applying the necessary transformations.
     def _prepare_data_lists(
         self, train_combinations, test_combinations, root_dir, augment
@@ -305,7 +311,9 @@ class SpawriousBenchmark(MultipleDomainDataset):
                     cg_data_list = []
                     for cls in classes:
                         path = os.path.join(
-                            root_dir, f"{0 if not self.type1 else ind}/{location}/{cls}"
+                            root_dir,
+                            "spawrious224",
+                            f"{0 if not self.type1 else ind}/{location}/{cls}",
                         )
                         data = CustomImageFolder(
                             folder_path=path,
@@ -336,7 +344,7 @@ class SpawriousBenchmark(MultipleDomainDataset):
         return data_list
 
 
-def get_torch_dataset(dataset_name: str, root_dir: str):
+def get_spawrious_dataset(dataset_name: str, root_dir: str):
     """
     Returns the dataset as a torch dataset, and downloads it if it is not already available.
     """
