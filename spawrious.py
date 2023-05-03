@@ -36,7 +36,7 @@ def _download_dataset_if_not_available(
     if dataset_name.split("_")[0] == "m2m":
         dataset_name = "m2m"
     url_dict = {
-        "entire_dataset": "https://www.dropbox.com/s/e40j553480h3f3s/spawrious224.tar.gz?dl=1",
+        "entire_dataset": "https://www.dropbox.com/s/383xmavhd3x0w2k/spawrious224_with_domain_adaptation.gz?dl=1",
         "o2o_easy": "https://www.dropbox.com/s/kwhiv60ihxe3owy/spawrious__o2o_easy.tar.gz?dl=1",
         "o2o_medium": "https://www.dropbox.com/s/x03gkhdwar5kht4/spawrious224__o2o_medium.tar.gz?dl=1",
         "o2o_hard": "https://www.dropbox.com/s/p1ry121m2gjj158/spawrious__o2o_hard.tar.gz?dl=1",
