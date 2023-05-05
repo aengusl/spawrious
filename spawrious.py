@@ -34,15 +34,15 @@ def _download_dataset_if_not_available(
     os.makedirs(data_dir, exist_ok=True)
     dataset_name = dataset_name.lower()
     if dataset_name.split("_")[0] == "m2m":
-        dataset_name = "m2m"
+        dataset_name = "entire_dataset"
     url_dict = {
-        "entire_dataset": "https://www.dropbox.com/s/383xmavhd3x0w2k/spawrious224_with_domain_adaptation.gz?dl=1",
-        "o2o_easy": "https://www.dropbox.com/s/kwhiv60ihxe3owy/spawrious__o2o_easy.tar.gz?dl=1",
+        "entire_dataset": "https://www.dropbox.com/s/1gkwqut1p735ccn/spawrious224__entire_dataset.tar.gz?dl=1",
+        "o2o_easy": "https://www.dropbox.com/s/kwhiv60ihxe3owy/spawrious224__o2o_easy.tar.gz?dl=1",
         "o2o_medium": "https://www.dropbox.com/s/x03gkhdwar5kht4/spawrious224__o2o_medium.tar.gz?dl=1",
-        "o2o_hard": "https://www.dropbox.com/s/p1ry121m2gjj158/spawrious__o2o_hard.tar.gz?dl=1",
-        "m2m": "https://www.dropbox.com/s/5usem63nfub266y/spawrious__m2m.tar.gz?dl=1",
+        "o2o_hard": "https://www.dropbox.com/s/p1ry121m2gjj158/spawrious224__o2o_hard.tar.gz?dl=1",
+        # "m2m": "https://www.dropbox.com/s/5usem63nfub266y/spawrious__m2m.tar.gz?dl=1",
     }
-    tar_file_name = f"spawrious__{dataset_name}.tar.gz"
+    tar_file_name = f"spawrious224__{dataset_name}.tar.gz"
     tar_file_dst = os.path.join(data_dir, tar_file_name)
     url = url_dict[dataset_name]
     # Check if the tar file is already downloaded and present in the data_dir
@@ -344,9 +344,11 @@ class SpawriousBenchmark(MultipleDomainDataset):
         return data_list
 
 
-def get_spawrious_dataset(dataset_name: str, root_dir: str):
+def get_spawrious_dataset(root_dir: str, dataset_name: str='entire_dataset'):
     """
-    Returns the dataset as a torch dataset, and downloads it if it is not already available.
+    Returns the dataset as a torch dataset, and downloads dataset if dataset is not already available.
+
+    By default, the entire dataset is downloaded, which is necessary for m2m experiments, and domain adaptation experiments
     """
     assert dataset_name.lower() in {
         "o2o_easy",
@@ -359,4 +361,9 @@ def get_spawrious_dataset(dataset_name: str, root_dir: str):
         "entire_dataset",
     }, f"Invalid dataset type: {dataset_name}"
     _download_dataset_if_not_available(dataset_name, root_dir)
+    # TODO: get m2m to use entire dataset, not half of it
     return SpawriousBenchmark(dataset_name, root_dir, augment=True)
+
+
+if __name__ == '__main__':
+    get_spawrious_dataset('./test_dir','m2m_easy')
