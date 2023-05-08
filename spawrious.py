@@ -31,6 +31,7 @@ def _download_dataset_if_not_available(
     """
     datasets.txt file, which is present in the data_dir, is used to check if the dataset is already extracted. If the dataset is already extracted, then the tar file is not downloaded again.
     """
+    data_dir = data_dir.split("/spawrious224/")[0] # in case people pass in the wrong root_dir
     os.makedirs(data_dir, exist_ok=True)
     dataset_name = dataset_name.lower()
     if dataset_name.split("_")[0] == "m2m":
@@ -45,48 +46,22 @@ def _download_dataset_if_not_available(
     tar_file_name = f"spawrious224__{dataset_name}.tar.gz"
     tar_file_dst = os.path.join(data_dir, tar_file_name)
     url = url_dict[dataset_name]
-    # Check if the tar file is already downloaded and present in the data_dir
-    if os.path.exists(tar_file_dst):
-        print("Dataset already downloaded.")
-        # Check if the datasets.txt file is present, and if the dataset is already extracted
-        if os.path.exists(os.path.join(data_dir, "datasets.txt")):
-            with open(os.path.join(data_dir, "datasets.txt"), "r") as f:
-                # lines = set(f.readlines())
-                lines = [line.strip() for line in f]
-                if (dataset_name in lines) or ("entire_dataset" in lines):
-                    print("... and extracted.")
-                else:
-                    print("Dataset not extracted. Extracting...")
-                    _extract_dataset_from_tar(
-                        tar_file_name, data_dir, remove_tar_after_extracting
-                    )
 
-                    # Write the dataset name to the datasets.txt file to mark extraction
-                    with open(os.path.join(data_dir, "datasets.txt"), "a") as f:
-                        f.write("\n" + dataset_name)
-        # If the datasets.txt file is not present, then extract the dataset
-        else:
-            print("Dataset not extracted. Extracting...")
+    # check if the dataset is already extracted
+    if _check_images_availability(data_dir, dataset_name):
+        print("Dataset already downloaded and extracted.")
+        return
+    # check if the tar file is already downloaded
+    else:
+        if os.path.exists(tar_file_dst):
+            print("Dataset already downloaded. Extracting...")
             _extract_dataset_from_tar(
                 tar_file_name, data_dir, remove_tar_after_extracting
             )
-            # Write the dataset name to the datasets.txt file to mark extraction
-            with open(os.path.join(data_dir, "datasets.txt"), "a") as f:
-                f.write("\n" + dataset_name)
-    # Check if the dataset is already extracted by inspecting the datasets.txt file
-    else:
-        download = True
-        # Check if the datasets.txt file is present, and if the dataset is already extracted
-        if os.path.exists(os.path.join(data_dir, "datasets.txt")):
-            with open(os.path.join(data_dir, "datasets.txt"), "r") as f:
-                # lines = set(f.readlines())
-                lines = [line.strip() for line in f]
-                if (dataset_name in lines) or ("entire_dataset" in lines):
-                    print("Dataset already downloaded and extracted.")
-                    download = False
-        # Download if the dataset is not already extracted
-        if download:
-            print("Dataset not found. Downloading...")
+            return
+        # download the tar file and extract from it
+        else:
+            print('Dataset not found. Downloading...')
             response = urllib.request.urlopen(url)
             total_size = int(response.headers.get("Content-Length", 0))
             block_size = 1024
@@ -104,10 +79,7 @@ def _download_dataset_if_not_available(
             _extract_dataset_from_tar(
                 tar_file_name, data_dir, remove_tar_after_extracting
             )
-            # Write the dataset name to the datasets.txt file to mark extraction
-            with open(os.path.join(data_dir, "datasets.txt"), "a") as f:
-                f.write("\n" + dataset_name)
-
+            return
 
 class CustomImageFolder(Dataset):
     """
@@ -343,6 +315,41 @@ class SpawriousBenchmark(MultipleDomainDataset):
 
         return data_list
 
+def _check_images_availability(root_dir: str, dataset_type: str) -> bool:
+    # Get the combinations for the given dataset type
+    root_dir = root_dir.split("/spawrious224/")[0] # in case people pass in the wrong root_dir
+    combinations = get_combinations(dataset_type.lower())
+
+    # Extract the train and test combinations
+    train_combinations = combinations["train_combinations"]
+    test_combinations = combinations["test_combinations"]
+
+    # Check if the relevant images for each combination are present in the root directory
+    for combination in [train_combinations, test_combinations]:
+        for classes, comb_list in combination.items():
+            for ind, location_limit in enumerate(comb_list):
+                if isinstance(location_limit, tuple):
+                    location, limit = location_limit
+                else:
+                    location, limit = location_limit, None
+
+                for cls in classes:
+                    path = os.path.join(
+                        root_dir,
+                        "spawrious224",
+                        f"{0 if not dataset_type.lower().startswith('o2o') else ind}/{location}/{cls}",
+                    )
+
+                    # If the path does not exist or there are no relevant images, return False
+                    if not os.path.exists(path) or not any(
+                        img.endswith((".png", ".jpg", ".jpeg")) for img in os.listdir(path)
+                    ):
+                        return False
+
+    # If all the required images are present, return True
+    return True
+
+
 
 def get_spawrious_dataset(root_dir: str, dataset_name: str='entire_dataset'):
     """
@@ -350,6 +357,7 @@ def get_spawrious_dataset(root_dir: str, dataset_name: str='entire_dataset'):
 
     By default, the entire dataset is downloaded, which is necessary for m2m experiments, and domain adaptation experiments
     """
+    root_dir = root_dir.split("/spawrious224/")[0] # in case people pass in the wrong root_dir
     assert dataset_name.lower() in {
         "o2o_easy",
         "o2o_medium",
@@ -366,4 +374,8 @@ def get_spawrious_dataset(root_dir: str, dataset_name: str='entire_dataset'):
 
 
 if __name__ == '__main__':
-    get_spawrious_dataset('./test_dir','m2m_easy')
+    # get_spawrious_dataset('./test_dir','m2m_easy')
+    root_dir = "/home/aengusl/Desktop/Projects/OOD_workshop/spawrious/data/"
+    dataset_type = "m2m_easy"
+    result = _check_images_availability(root_dir, dataset_type)
+    print(result)
