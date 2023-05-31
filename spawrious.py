@@ -37,7 +37,7 @@ def _download_dataset_if_not_available(
     if dataset_name.split("_")[0] == "m2m":
         dataset_name = "entire_dataset"
     url_dict = {
-        "entire_dataset": "https://www.dropbox.com/s/1gkwqut1p735ccn/spawrious224__entire_dataset.tar.gz?dl=1",
+        "entire_dataset": "https://www.dropbox.com/s/hofkueo8qvaqlp3/spawrious224__entire_dataset.tar.gz?dl=1",
         "o2o_easy": "https://www.dropbox.com/s/kwhiv60ihxe3owy/spawrious224__o2o_easy.tar.gz?dl=1",
         "o2o_medium": "https://www.dropbox.com/s/x03gkhdwar5kht4/spawrious224__o2o_medium.tar.gz?dl=1",
         "o2o_hard": "https://www.dropbox.com/s/p1ry121m2gjj158/spawrious224__o2o_hard.tar.gz?dl=1",
@@ -164,7 +164,7 @@ def build_combination(benchmark_type, group, test, filler=None):
     return combinations
 
 
-def get_combinations(benchmark_type: str) -> Tuple[dict, dict]:
+def _get_combinations(benchmark_type: str) -> Tuple[dict, dict]:
     combinations = {
         "o2o_easy": (
             ["desert", "jungle", "dirt", "snow"],
@@ -210,7 +210,7 @@ class SpawriousBenchmark(MultipleDomainDataset):
     class_list = ["bulldog", "corgi", "dachshund", "labrador"]
 
     def __init__(self, benchmark, root_dir, augment=True):
-        combinations = get_combinations(benchmark.lower())
+        combinations = _get_combinations(benchmark.lower())
         self.type1 = benchmark.lower().startswith("o2o")
         train_datasets, test_datasets = self._prepare_data_lists(
             combinations["train_combinations"],
@@ -318,7 +318,17 @@ class SpawriousBenchmark(MultipleDomainDataset):
 def _check_images_availability(root_dir: str, dataset_type: str) -> bool:
     # Get the combinations for the given dataset type
     root_dir = root_dir.split("/spawrious224/")[0] # in case people pass in the wrong root_dir
-    combinations = get_combinations(dataset_type.lower())
+    if dataset_type == "entire_dataset":
+        for dataset in ['0', '1', 'domain_adaptation_ds']:
+            for location in ['snow', 'jungle', 'desert', 'dirt', 'mountain', 'beach']:
+                for cls in ['bulldog', 'corgi', 'dachshund', 'labrador']:
+                    path = os.path.join(root_dir, "spawrious224", f"{dataset}/{location}/{cls}")
+                    if not os.path.exists(path) or not any(
+                        img.endswith((".png", ".jpg", ".jpeg")) for img in os.listdir(path)
+                    ):
+                        return False
+        return True
+    combinations = _get_combinations(dataset_type.lower())
 
     # Extract the train and test combinations
     train_combinations = combinations["train_combinations"]
@@ -373,9 +383,3 @@ def get_spawrious_dataset(root_dir: str, dataset_name: str='entire_dataset'):
     return SpawriousBenchmark(dataset_name, root_dir, augment=True)
 
 
-if __name__ == '__main__':
-    # get_spawrious_dataset('./test_dir','m2m_easy')
-    root_dir = "/home/aengusl/Desktop/Projects/OOD_workshop/spawrious/data/"
-    dataset_type = "m2m_easy"
-    result = _check_images_availability(root_dir, dataset_type)
-    print(result)

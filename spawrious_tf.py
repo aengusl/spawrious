@@ -35,7 +35,7 @@ def _download_dataset_if_not_available(
     if dataset_name.split("_")[0] == "m2m":
         dataset_name = "entire_dataset"
     url_dict = {
-        "entire_dataset": "https://www.dropbox.com/s/1gkwqut1p735ccn/spawrious224__entire_dataset.tar.gz?dl=1",
+        "entire_dataset": "https://www.dropbox.com/s/hofkueo8qvaqlp3/spawrious224__entire_dataset.tar.gz?dl=1",
         "o2o_easy": "https://www.dropbox.com/s/kwhiv60ihxe3owy/spawrious224__o2o_easy.tar.gz?dl=1",
         "o2o_medium": "https://www.dropbox.com/s/x03gkhdwar5kht4/spawrious224__o2o_medium.tar.gz?dl=1",
         "o2o_hard": "https://www.dropbox.com/s/p1ry121m2gjj158/spawrious224__o2o_hard.tar.gz?dl=1",
@@ -348,7 +348,7 @@ def _check_images_availability(root_dir: str, dataset_type: str) -> bool:
 
                 for cls in classes:
                     path = os.path.join(
-                        root_dir,
+                            root_dir,
                         "spawrious224",
                         f"{0 if not dataset_type.lower().startswith('o2o') else ind}/{location}/{cls}",
                     )
