@@ -6,9 +6,7 @@ setup(
   description="A package for generating random data",
   author="Aengus Lynch et al",
   author_email="aengus.lynch.17@ucl.ac.uk",
-  url="https://github.com/aengusl/spawrious/new/main",
-  packages=["spawrious"],
-  install_requires=["numpy"],
+  url="https://github.com/aengusl/spawrious",
   license="CC-BY-SA 4.0",
   classifiers=[
     "Programming Language :: Python :: 3",
