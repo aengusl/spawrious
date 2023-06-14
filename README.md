@@ -1,5 +1,7 @@
 # Spawrious
 
+[spawrious.com](spawrious.com)
+
 ## One-to-one Spurious Correlations
 ![gif](twitter_gif_preview_o2o.gif)
 
@@ -71,3 +73,16 @@ This work is licensed under a
 [cc-by]: http://creativecommons.org/licenses/by/4.0/
 [cc-by-image]: https://i.creativecommons.org/l/by/4.0/88x31.png
 [cc-by-shield]: https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg
+
+## Citation
+
+```
+@misc{lynch2023spawrious,
+      title={Spawrious: A Benchmark for Fine Control of Spurious Correlation Biases}, 
+      author={Aengus Lynch and Gbètondji J-S Dovonon and Jean Kaddour and Ricardo Silva},
+      year={2023},
+      eprint={2303.05470},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+```
