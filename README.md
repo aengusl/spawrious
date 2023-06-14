@@ -17,7 +17,9 @@ Datasets take the following names:
 - `o2o_easy`
 - `o2o_medium`
 - `o2o_hard`
-- `m2m` 
+- `m2m_easy`
+- `m2m_medium`
+- `m2m_hard` 
  
 Running the command below retrieves the appropriate dataset at a user specified user directory (and downloads the dataset if not available), trains a [resnet18](https://pytorch.org/hub/pytorch_vision_resnet/), and evaluates the results on the OOD test set.
 
