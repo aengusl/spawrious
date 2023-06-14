@@ -1,7 +1,9 @@
 # Spawrious
 
-![Overview](overview.png "Spawrious")
+## One-to-one Spurious Correlations
+![gif](twitter_gif_preview_o2o.gif)
 
+## Many-to-many Spurious Correlations
 ![gif](twitter_gif_preview_m2m.gif)
 
 Spawrious is a challenging OOD image classification benchmark ([link to paper](https://arxiv.org/abs/2303.05470)). It consists of 6 separate OOD challenges split into two types: one-to-one and many-to-many spurious correlation challenges.
