@@ -10,7 +10,7 @@ from torchvision import models
 from tqdm import tqdm
 from tqdm.auto import tqdm
 
-from spawrious import get_spawrious_dataset
+from spawrious.torch import get_spawrious_dataset
 
 
 def parse_args():
