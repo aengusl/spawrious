@@ -21,22 +21,29 @@ Running the command below retrieves the appropriate dataset at a user specified 
 python example.py --data_dir <path to data dir> --dataset <one of the list above>
 ```
 
-## Downloading the datasets
-
-### Formatting
-
-The datasets overlap in images, but are offered separately anyway. In order to avoid image duplicates, create a text file `datasets.txt` in the data directory (`path to data dir`), with the name of the dataset that has been downloaded. For example, if both one-to-one easy and one-to-one hard have been downloaded, the data directory will look like
-
+## Installation
 ```
-data
-│   datasets.txt
-└───spawrious224
+pip install git+https://github.com/aengusl/spawrious.git
 ```
-where the `datasets.txt` file looks like
 
+
+## Using the datasets
 ```
-o2o_easy
-o2o_hard
+from spawrious.torch import get_spawrious_dataset
+# spawrious.tf if using tensorflow or jax
+
+dataset = "m2m_medium"
+data_dir = ".data/"
+val_split = 0.2
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+spawrious = get_spawrious_dataset(dataset_name=dataset, root_dir=data_dir)
+train_set = spawrious.get_train_dataset()
+test_set = spawrious.get_test_dataset()
+val_size = int(len(train_set) * val_split)
+train_set, val_set = torch.utils.data.random_split(
+    train_set, [len(train_set) - val_size, val_size]
+)
 ```
 
 ### Click to download the datasets:
