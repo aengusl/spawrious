@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
   name="spawrious",
@@ -7,6 +7,7 @@ setup(
   author="Aengus Lynch et al",
   author_email="aengus.lynch.17@ucl.ac.uk",
   url="https://github.com/aengusl/spawrious",
+  packages=find_packages(),
   license="CC-BY-SA 4.0",
   classifiers=[
     "Programming Language :: Python :: 3",
