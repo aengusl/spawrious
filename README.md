@@ -28,7 +28,7 @@ pip install git+https://github.com/aengusl/spawrious.git
 
 
 ## Using the datasets
-```
+```python
 from spawrious.torch import get_spawrious_dataset
 # spawrious.tf if using tensorflow or jax
 
