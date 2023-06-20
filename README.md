@@ -1,6 +1,6 @@
 # Spawrious
 
-[spawrious.com](https://aengusl.github.io/spawrious.github.io/)
+[Leaderboard results](https://aengusl.github.io/spawrious.github.io/)
 
 ## One-to-one Spurious Correlations
 ![gif](twitter_gif_preview_o2o.gif)
