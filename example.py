@@ -62,7 +62,7 @@ def train(
 
     for epoch in tqdm(range(num_epochs), desc="Training. Epochs", leave=False):
         running_loss = 0.0
-        for inputs, labels in tqdm(train_loader):
+        for inputs, labels, _ in tqdm(train_loader): # third item is the location label
             inputs, labels = inputs.to(device), labels.to(device)
             optimizer.zero_grad()
             outputs = model(inputs)
@@ -81,7 +81,7 @@ def evaluate(model: Module, loader: DataLoader, device: torch.device) -> None:
     correct = 0
     total = 0
     with torch.no_grad():
-        for inputs, labels in tqdm(loader, desc="Evaluating", leave=False):
+        for inputs, labels, _ in tqdm(loader, desc="Evaluating", leave=False): # third item is the location label
             inputs, labels = inputs.to(device), labels.to(device)
             outputs = model(inputs)
             _, predicted = torch.max(outputs.data, 1)
