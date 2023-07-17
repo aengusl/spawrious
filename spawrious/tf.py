@@ -99,9 +99,10 @@ class CustomImageFolder(tf.keras.utils.Sequence):
     A class that takes one folder at a time and loads a set number of images in a folder and assigns them a specific class
     """
 
-    def __init__(self, folder_path, class_index, limit=None, preprocess_func=None):
+    def __init__(self, folder_path, class_index, location_index, limit=None, preprocess_func=None):
         self.folder_path = folder_path
         self.class_index = class_index
+        self.location_index = location_index
         self.image_paths = [
             os.path.join(folder_path, img)
             for img in os.listdir(folder_path)
@@ -114,7 +115,7 @@ class CustomImageFolder(tf.keras.utils.Sequence):
     def __len__(self):
         return len(self.image_paths)
 
-    def __getitem__(self, index: int) -> Tuple[Any, Any]:
+    def __getitem__(self, index: int) -> Tuple[Any, Any, Any]:
         img_path = self.image_paths[index]
         img = Image.open(img_path).convert("RGB")
         img = tf.keras.preprocessing.image.img_to_array(img)
@@ -122,8 +123,9 @@ class CustomImageFolder(tf.keras.utils.Sequence):
         if self.preprocess_func:
             img = self.preprocess_func(img)
 
-        label = tf.convert_to_tensor(self.class_index, dtype=tf.int64)
-        return img, label
+        class_label = tf.convert_to_tensor(self.class_index, dtype=tf.int64)
+        location_label = tf.convert_to_tensor(self.location_index, dtype=tf.int64)
+        return img, class_label, location_label
 
 
 class MultipleDomainDataset:
@@ -222,6 +224,7 @@ class SpawriousBenchmark(MultipleDomainDataset):
     input_shape = (3, 224, 224)
     num_classes = 4
     class_list = ["bulldog", "corgi", "dachshund", "labrador"]
+    locations_list = ["desert", "jungle", "dirt", "mountain", "snow", "beach"]
 
     def __init__(self, benchmark, root_dir, augment=True):
         combinations = get_combinations(benchmark.lower())
@@ -289,6 +292,7 @@ class SpawriousBenchmark(MultipleDomainDataset):
                         data = CustomImageFolder(
                             folder_path=path,
                             class_index=self.class_list.index(cls),
+                            location_index=self.locations_list.index(location),
                             limit=limit,
                             transform=transforms,
                         )
