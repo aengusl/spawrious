@@ -1,6 +1,12 @@
 # Spawrious
 
-![Overview](overview.png "Spawrious")
+[Leaderboard results](https://aengusl.github.io/spawrious.github.io/)
+
+## One-to-one Spurious Correlations
+![gif](twitter_gif_preview_o2o_HQ.gif)
+
+## Many-to-many Spurious Correlations
+![gif](twitter_gif_preview_m2m_HQ.gif)
 
 Spawrious is a challenging OOD image classification benchmark ([link to paper](https://arxiv.org/abs/2303.05470)). It consists of 6 separate OOD challenges split into two types: one-to-one and many-to-many spurious correlation challenges.
 
@@ -13,7 +19,9 @@ Datasets take the following names:
 - `o2o_easy`
 - `o2o_medium`
 - `o2o_hard`
-- `m2m` 
+- `m2m_easy`
+- `m2m_medium`
+- `m2m_hard` 
  
 Running the command below retrieves the appropriate dataset at a user specified user directory (and downloads the dataset if not available), trains a [resnet18](https://pytorch.org/hub/pytorch_vision_resnet/), and evaluates the results on the OOD test set.
 
@@ -21,22 +29,29 @@ Running the command below retrieves the appropriate dataset at a user specified 
 python example.py --data_dir <path to data dir> --dataset <one of the list above>
 ```
 
-## Downloading the datasets
-
-### Formatting
-
-The datasets overlap in images, but are offered separately anyway. In order to avoid image duplicates, create a text file `datasets.txt` in the data directory (`path to data dir`), with the name of the dataset that has been downloaded. For example, if both one-to-one easy and one-to-one hard have been downloaded, the data directory will look like
-
+## Installation
 ```
-data
-│   datasets.txt
-└───spawrious224
+pip install git+https://github.com/aengusl/spawrious.git
 ```
-where the `datasets.txt` file looks like
 
-```
-o2o_easy
-o2o_hard
+
+## Using the datasets
+```python
+from spawrious.torch import get_spawrious_dataset
+# spawrious.tf if using tensorflow or jax
+
+dataset = "m2m_medium"
+data_dir = ".data/"
+val_split = 0.2
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+spawrious = get_spawrious_dataset(dataset_name=dataset, root_dir=data_dir)
+train_set = spawrious.get_train_dataset()
+test_set = spawrious.get_test_dataset()
+val_size = int(len(train_set) * val_split)
+train_set, val_set = torch.utils.data.random_split(
+    train_set, [len(train_set) - val_size, val_size]
+)
 ```
 
 ### Click to download the datasets:
@@ -46,6 +61,18 @@ o2o_hard
 - [one-to-one hard](https://www.dropbox.com/s/p1ry121m2gjj158/spawrious__o2o_hard.tar.gz?dl=1)
 - [many-to-many (all)](https://www.dropbox.com/s/5usem63nfub266y/spawrious__m2m.tar.gz?dl=1)
 
+## Citation
+
+```
+@misc{lynch2023spawrious,
+      title={Spawrious: A Benchmark for Fine Control of Spurious Correlation Biases}, 
+      author={Aengus Lynch and Gbètondji J-S Dovonon and Jean Kaddour and Ricardo Silva},
+      year={2023},
+      eprint={2303.05470},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+```
 ## Licensing
 
 Shield: [![CC BY 4.0][cc-by-shield]][cc-by]
