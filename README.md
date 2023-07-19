@@ -61,6 +61,10 @@ train_set, val_set = torch.utils.data.random_split(
 - [one-to-one hard](https://www.dropbox.com/s/p1ry121m2gjj158/spawrious__o2o_hard.tar.gz?dl=1)
 - [many-to-many (all)](https://www.dropbox.com/s/5usem63nfub266y/spawrious__m2m.tar.gz?dl=1)
 
+## Generate your own data
+
+If you want to generate your own data, or understand how we generated ours, take a look at `generate_dataset.py`. To run this file, you additionally need to install `diffusers` and `transformers`.
+
 ## Citation
 
 ```
