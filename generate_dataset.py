@@ -28,7 +28,7 @@ def get_config():
 
     # Define argument parser
     parser = argparse.ArgumentParser()
-    parser.add_argument("--global_save_label", type=str, help="path to dataset folder")
+    parser.add_argument("--global_save_label", type=str, required=True, help="path to dataset folder")
     parser.add_argument("--batch_size", type=int, default=3, help="Batch size")
     parser.add_argument("--minibatch_size", type=int, default=4, help="Minibatch size")
     parser.add_argument("--device", type=str, default="cuda", help="Device to use (cuda or cpu)")
@@ -61,6 +61,9 @@ tokenizer = AutoTokenizer.from_pretrained("nlpconnect/vit-gpt2-image-captioning"
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
+max_length = 16
+num_beams = 4
+gen_kwargs = {"max_length": max_length, "num_beams": num_beams}
 
 config = get_config()
 global_save_label = config.global_save_label
