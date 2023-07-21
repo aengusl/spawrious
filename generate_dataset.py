@@ -154,7 +154,7 @@ def generate_batch(prompt: str, save_label: str, keywords: list = ['dog'], negat
             images = output.images
 
             # Filter out dirty images
-            dirty_bool = False
+            dirty_bool = dirty_image_keyword_filter(images, keywords)
             nsfw_bool = sum(output.nsfw_content_detected) > 0 #True if any images are nsfw
             if dirty_bool or nsfw_bool:
                 print('Bad images detected: \n', 'dirty_bool:', dirty_bool, ', nsfw_bool:', nsfw_bool)
