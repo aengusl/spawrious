@@ -10,6 +10,14 @@ from torch.utils.data import ConcatDataset, Dataset
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
 from tqdm import tqdm
+import timm
+from PIL import ImageFile
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+
+# MODEL_NAME = "vit_so400m_patch14_siglip_384"
+# MODEL_NAME = 'swin_base_patch4_window7_224.ms_in22k_ft_in1k'
+MODEL_NAME = 'deit3_base_patch16_224.fb_in22k_ft_in1k'
 
 
 def _extract_dataset_from_tar(
@@ -31,7 +39,9 @@ def _download_dataset_if_not_available(
     """
     datasets.txt file, which is present in the data_dir, is used to check if the dataset is already extracted. If the dataset is already extracted, then the tar file is not downloaded again.
     """
-    data_dir = data_dir.split("/spawrious224/")[0] # in case people pass in the wrong root_dir
+    data_dir = data_dir.split("/spawrious224/")[
+        0
+    ]  # in case people pass in the wrong root_dir
     os.makedirs(data_dir, exist_ok=True)
     dataset_name = dataset_name.lower()
     if dataset_name.split("_")[0] == "m2m":
@@ -61,7 +71,7 @@ def _download_dataset_if_not_available(
             return
         # download the tar file and extract from it
         else:
-            print('Dataset not found. Downloading...')
+            print("Dataset not found. Downloading...")
             response = urllib.request.urlopen(url)
             total_size = int(response.headers.get("Content-Length", 0))
             block_size = 1024
@@ -81,12 +91,15 @@ def _download_dataset_if_not_available(
             )
             return
 
+
 class CustomImageFolder(Dataset):
     """
     A class that takes one folder at a time and loads a set number of images in a folder and assigns them a specific class
     """
 
-    def __init__(self, folder_path, class_index, location_index, limit=None, transform=None):
+    def __init__(
+        self, folder_path, class_index, location_index, limit=None, transform=None
+    ):
         self.folder_path = folder_path
         self.class_index = class_index
         self.location_index = location_index
@@ -233,28 +246,30 @@ class SpawriousBenchmark(MultipleDomainDataset):
     def _prepare_data_lists(
         self, train_combinations, test_combinations, root_dir, augment
     ):
-        test_transforms = transforms.Compose(
-            [
-                transforms.Resize((self.input_shape[1], self.input_shape[2])),
-                transforms.transforms.ToTensor(),
-                transforms.Normalize(
-                    mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
-                ),
-            ]
+        backbone = timm.create_model(
+            # "vit_so400m_patch14_siglip_384",
+            MODEL_NAME,
+            pretrained=True,
+            num_classes=0,
+        ).eval()
+        self.data_config = timm.data.resolve_model_data_config(backbone)
+        test_transforms = timm.data.create_transform(
+            **self.data_config, is_training=False
         )
 
+        # test_transforms = transforms.Compose(
+        #     [
+        #         transforms.Resize((self.input_shape[1], self.input_shape[2])),
+        #         transforms.transforms.ToTensor(),
+        #         transforms.Normalize(
+        #             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+        #         ),
+        #     ]
+        # )
+
         if augment:
-            train_transforms = transforms.Compose(
-                [
-                    transforms.Resize((self.input_shape[1], self.input_shape[2])),
-                    transforms.RandomHorizontalFlip(),
-                    transforms.ColorJitter(0.3, 0.3, 0.3, 0.3),
-                    transforms.RandomGrayscale(),
-                    transforms.ToTensor(),
-                    transforms.Normalize(
-                        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
-                    ),
-                ]
+            train_transforms = timm.data.create_transform(
+                **self.data_config, is_training=True
             )
         else:
             train_transforms = test_transforms
@@ -272,7 +287,6 @@ class SpawriousBenchmark(MultipleDomainDataset):
     def _create_data_list(self, combinations, root_dir, transforms):
         data_list = []
         if isinstance(combinations, dict):
-
             # Build class groups for a given set of combinations, root directory, and transformations.
             for_each_class_group = []
             cg_index = 0
@@ -319,16 +333,22 @@ class SpawriousBenchmark(MultipleDomainDataset):
 
         return data_list
 
+
 def _check_images_availability(root_dir: str, dataset_type: str) -> bool:
     # Get the combinations for the given dataset type
-    root_dir = root_dir.split("/spawrious224/")[0] # in case people pass in the wrong root_dir
+    root_dir = root_dir.split("/spawrious224/")[
+        0
+    ]  # in case people pass in the wrong root_dir
     if dataset_type == "entire_dataset":
-        for dataset in ['0', '1', 'domain_adaptation_ds']:
-            for location in ['snow', 'jungle', 'desert', 'dirt', 'mountain', 'beach']:
-                for cls in ['bulldog', 'corgi', 'dachshund', 'labrador']:
-                    path = os.path.join(root_dir, "spawrious224", f"{dataset}/{location}/{cls}")
+        for dataset in ["0", "1", "domain_adaptation_ds"]:
+            for location in ["snow", "jungle", "desert", "dirt", "mountain", "beach"]:
+                for cls in ["bulldog", "corgi", "dachshund", "labrador"]:
+                    path = os.path.join(
+                        root_dir, "spawrious224", f"{dataset}/{location}/{cls}"
+                    )
                     if not os.path.exists(path) or not any(
-                        img.endswith((".png", ".jpg", ".jpeg")) for img in os.listdir(path)
+                        img.endswith((".png", ".jpg", ".jpeg"))
+                        for img in os.listdir(path)
                     ):
                         return False
         return True
@@ -356,7 +376,8 @@ def _check_images_availability(root_dir: str, dataset_type: str) -> bool:
 
                     # If the path does not exist or there are no relevant images, return False
                     if not os.path.exists(path) or not any(
-                        img.endswith((".png", ".jpg", ".jpeg")) for img in os.listdir(path)
+                        img.endswith((".png", ".jpg", ".jpeg"))
+                        for img in os.listdir(path)
                     ):
                         return False
 
@@ -364,14 +385,15 @@ def _check_images_availability(root_dir: str, dataset_type: str) -> bool:
     return True
 
 
-
-def get_spawrious_dataset(root_dir: str, dataset_name: str='entire_dataset'):
+def get_spawrious_dataset(root_dir: str, dataset_name: str = "entire_dataset"):
     """
     Returns the dataset as a torch dataset, and downloads dataset if dataset is not already available.
 
     By default, the entire dataset is downloaded, which is necessary for m2m experiments, and domain adaptation experiments
     """
-    root_dir = root_dir.split("/spawrious224/")[0] # in case people pass in the wrong root_dir
+    root_dir = root_dir.split("/spawrious224/")[
+        0
+    ]  # in case people pass in the wrong root_dir
     assert dataset_name.lower() in {
         "o2o_easy",
         "o2o_medium",
@@ -385,5 +407,3 @@ def get_spawrious_dataset(root_dir: str, dataset_name: str='entire_dataset'):
     _download_dataset_if_not_available(dataset_name, root_dir)
     # TODO: get m2m to use entire dataset, not half of it
     return SpawriousBenchmark(dataset_name, root_dir, augment=True)
-
-
