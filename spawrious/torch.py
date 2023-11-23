@@ -17,7 +17,16 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # MODEL_NAME = "vit_so400m_patch14_siglip_384"
 # MODEL_NAME = 'swin_base_patch4_window7_224.ms_in22k_ft_in1k'
-MODEL_NAME = 'deit3_base_patch16_224.fb_in22k_ft_in1k'
+# MODEL_NAME = 'deit3_base_patch16_224.fb_in22k_ft_in1k'
+# MODEL_NAME = 'beit_base_patch16_224.in22k_ft_in22k_in1k'
+MODEL_NAME = 'eva02_base_patch14_448.mim_in22k_ft_in22k_in1k'
+# MODEL_NAME = 'levit_128s.fb_dist_in1k'
+
+MODEL_NAME = None
+
+def set_model_name(name):
+    global MODEL_NAME
+    MODEL_NAME = name
 
 
 def _extract_dataset_from_tar(

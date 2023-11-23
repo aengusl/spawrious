@@ -17,7 +17,9 @@ import wandb
 # # MODEL_NAME = 'swin_base_patch4_window7_224.ms_in22k_ft_in1k'
 # MODEL_NAME = 'deit3_base_patch16_224.fb_in22k_ft_in1k'
 from spawrious.torch import MODEL_NAME
+from spawrious.torch import set_model_name
 
+set_model_name('deit3_base_patch16_224.fb_in22k_ft_in1k')
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -118,6 +120,12 @@ class ClassifierOnTop(nn.Module):
             self.linear = nn.Linear(1024, num_classes)
         elif MODEL_NAME == 'deit3_base_patch16_224.fb_in22k_ft_in1k':
             self.linear = nn.Linear(768, num_classes)
+        elif MODEL_NAME == 'beit_base_patch16_224.in22k_ft_in22k_in1k':
+            self.linear = nn.Linear(768, num_classes)
+        elif MODEL_NAME == 'eva02_base_patch14_448.mim_in22k_ft_in22k_in1k':
+            self.linear = nn.Linear(768, num_classes)
+        elif MODEL_NAME == 'levit_128s.fb_dist_in1k':
+            self.linear = nn.Linear(384, num_classes)
 
     def forward(self, x):
         with torch.no_grad():
