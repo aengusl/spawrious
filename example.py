@@ -16,10 +16,10 @@ import wandb
 # # MODEL_NAME = "vit_so400m_patch14_siglip_384"
 # # MODEL_NAME = 'swin_base_patch4_window7_224.ms_in22k_ft_in1k'
 # MODEL_NAME = 'deit3_base_patch16_224.fb_in22k_ft_in1k'
-from spawrious.torch import MODEL_NAME
+# from spawrious.torch import MODEL_NAME
 from spawrious.torch import set_model_name
-
-set_model_name('deit3_base_patch16_224.fb_in22k_ft_in1k')
+MODEL_NAME = 'eva02_base_patch14_448.mim_in22k_ft_in22k_in1k'
+set_model_name(MODEL_NAME)
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -142,9 +142,9 @@ def get_model(args: argparse.Namespace) -> Module:
     return model
 
 
-def main() -> None:
+def main(dataset) -> None:
     args = parse_args()
-    experiment_name = f"{args.dataset}_{MODEL_NAME.split('_')[0]}-e={args.num_epochs}-lr={args.lr}"
+    experiment_name = f"{dataset}_{MODEL_NAME.split('_')[0]}-e={args.num_epochs}-lr={args.lr}"
     wandb.init(project="spawrious", name=experiment_name, config=args)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     spawrious = get_spawrious_dataset(dataset_name=args.dataset, root_dir=args.data_dir)
@@ -191,4 +191,13 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    dataset_choices = [
+            # "o2o_easy",
+            # "o2o_medium",
+            # "o2o_hard",
+            "m2m_easy",
+            "m2m_medium",
+            # "m2m_hard",
+        ]
+    for dataset in dataset_choices:
+        main(dataset)
