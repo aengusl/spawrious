@@ -34,6 +34,11 @@ python example.py --data_dir <path to data dir> --dataset <one of the list above
 pip install git+https://github.com/aengusl/spawrious.git
 ```
 
+## HParams
+
+- [ResNet50](https://huggingface.co/datasets/aengusl/spawrious_resnet50_hparams_dict?row=0)
+- [ResNet18](https://huggingface.co/datasets/aengusl/spawrious_resnet18_hparams_dict)
+
 
 ## Using the datasets
 ```python
